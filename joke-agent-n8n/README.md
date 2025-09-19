@@ -33,7 +33,7 @@ Here’s what the workflow looks like in n8n:
 ## 🚀 Getting Started
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/joke-agent-n8n.git
+   git clone https://github.com/Ro706/n8n-AI-agent-template/joke-agent-n8n.git
    cd joke-agent-n8n
    ```
 
