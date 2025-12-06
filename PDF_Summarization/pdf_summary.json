@@ -1,0 +1,198 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "PDF Summarization Request Form",
+        "formDescription": "This form allows you to upload a PDF document and request a concise, AI‑generated summary. By submitting your file, you’ll receive a clear, structured overview of the content—highlighting key points, main arguments, and essential details—without needing to read the entire document. Perfect for quickly understanding reports, research papers, contracts, or lengthy documents.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "File",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Number Of Word",
+              "fieldType": "number",
+              "placeholder": "100",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Language",
+              "placeholder": "English",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "db42e799-1f19-4506-a59d-7f81530c9646",
+      "name": "On form submission",
+      "webhookId": "82026c06-9f5c-4971-b374-f479d89aad2f"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "File",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "7ce68025-cf58-43c7-bfac-5e6c4712d769",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert multilingual document-summarization agent.  \nYour task is to summarize the extracted chunk of PDF text provided to you.  \n\nFollow these rules:\n\n1. Summarize the content in **approximately {{ $('On form submission').item.json[\"Number Of Word\"] }} words**.  \n2. Produce the summary **strictly in the language specified**:\n   → {{ $('On form submission').item.json.Language }}\n3. Focus only on the information that appears in the given text chunk.  \n4. Extract and emphasize:\n   - Main ideas and core arguments\n   - Key facts, data points, and findings\n   - Important limitations, disclaimers, or missing information\n5. Avoid:\n   - Repetition\n   - Guessing missing context\n   - Adding your own opinions\n   - Filler text\n\nText to summarize:\n{{ $json.text }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        128,
+        0
+      ],
+      "id": "8bd801ec-c289-4634-931a-9953e4bb7b60",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        176
+      ],
+      "id": "6d46ec97-43b0-4cec-9a4e-92f25f960479",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EA6JCFCVAWUPeKlZ",
+          "name": "Google Gemini(PaLM) Api account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e1c7c54-0eff-4864-897f-e032ed5268ce",
+              "name": "Data",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4fa42bfa-d8b4-43a5-a61b-9ea483af7d24",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "Data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        0
+      ],
+      "id": "ad686426-4039-45f4-8f43-7f3fd1da8377",
+      "name": "Convert to File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0971aa7b-b21a-4405-baf7-a72160437b02",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6222274b4cb72740eaed902916eb76a286d1ef234308e6d1d84d668a1c7f812"
+  },
+  "id": "ihBylresNJv9EaOE",
+  "tags": []
+}
