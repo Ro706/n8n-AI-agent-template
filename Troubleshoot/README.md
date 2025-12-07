@@ -64,28 +64,24 @@ If approved, n8n executes the fix via SSH using a sub-workflow.
 ```mermaid
 flowchart TD
 
-    A[Schedule Trigger] --> B[Set Prompt & ChatID]
-    B --> C[AI Agent (Gemini)]
+    A[Schedule Trigger] --> B[Set Prompt and ChatID]
+    B --> C[AI Agent]
 
-    %% Diagnostics and HTTP check split
-    C --> D[HTTP Tool<br/>Checks Website]
-    C --> E[CLI Tool<br/>Diagnostics (lsof, docker ps)]
+    C --> D[HTTP Tool]
+    C --> E[CLI Tool]
 
     D --> F[Structured Output Parser]
     E --> F
 
-    %% Website UP
-    F -->|website_up = true| G[Website UP<br/>Send Status to Discord]
+    F -->|website_up = true| G[Website UP - Send Status to Discord]
 
-    %% Website DOWN branch
-    F -->|website_up = false| H[Website DOWN<br/>AI Requests Approval]
+    F -->|website_up = false| H[Website DOWN - AI Requests Approval]
 
-    H --> I[Send & Wait for Approval on Discord]
-    I --> J[Human Responds]
+    H --> I[Send and Wait Message to Discord]
+    I --> J[Human Approval]
 
-    J -->|Approved| K[Run SSH Commands<br/>docker start / kill PID]
-    J -->|Rejected| L[Do Nothing<br/>Notify & Stop]
-
+    J -->|Approved| K[Run SSH Commands]
+    J -->|Rejected| L[Stop - No Action]
 ```
 
 ---
