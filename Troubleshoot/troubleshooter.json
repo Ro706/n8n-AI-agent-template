@@ -1,0 +1,575 @@
+{
+  "name": "troubleshooter",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{ $json.chatid }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        -432
+      ],
+      "id": "6aa808be-7ee9-4355-abaf-9ff400848fb1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -656
+      ],
+      "id": "4371f906-f4bf-417d-9b2b-8a9f953fb7b0",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1bbefd20-694b-40a5-ae9a-9e2e00b89989",
+              "name": "prompt",
+              "value": "Monitor the website http://10.62.17.132:8090/ .if it's down, fix it.",
+              "type": "string"
+            },
+            {
+              "id": "99dcfc2b-77fd-4f2f-90b9-bb543b14c4fd",
+              "name": "chatid",
+              "value": "Friday706",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        -656
+      ],
+      "id": "69f8a350-4cc1-45ce-bd54-452982f5cee4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"website_up\": true,\n    \"message\": \"Detailed explanation of status and any actions taken\",\n    \"applied_fix\": true,\n    \"needs_approval\": true,\n    \"commands_requested\": \"Specific commands needing approval (null if none)\"\n}\n",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        -432
+      ],
+      "id": "870d095a-d2cd-4cca-9621-7cd0331d0b9a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "549024bd-af1d-4464-b71b-bf1821d4f3e1",
+              "leftValue": "={{ $json.output.website_up }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        -400
+      ],
+      "id": "30952a66-437f-4a94-a854-b02aa8b015a9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "description": "Use the tool to run commands on the server running our website for troubleshooting purposes",
+        "workflowId": {
+          "__rl": true,
+          "value": "R3vsrMvEH8Z9tPFU",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/R3vsrMvEH8Z9tPFU",
+          "cachedResultName": "call SSH_n8n_server"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "command": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('command', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "command"
+          ],
+          "schema": [
+            {
+              "id": "command",
+              "displayName": "command",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -432
+      ],
+      "id": "b9d53c6b-404a-46ff-a76b-c1f1b24174de",
+      "name": "CLI TOOL"
+    },
+    {
+      "parameters": {
+        "toolDescription": "User this tool to see if the website is up.",
+        "url": "http://10.62.17.132:8090/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        -432
+      ],
+      "id": "86bf63be-5af3-4360-9578-f94b2f93ff8e",
+      "name": "HTTP tool"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -432
+      ],
+      "id": "35dfd10d-9e1d-492f-8a32-21de2eeb13dd",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "e22jCIWd7CgStM5t",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6878166d-15e6-448d-b768-e4f358fe9577",
+              "leftValue": "={{ $json.output.needs_approval }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        -672
+      ],
+      "id": "7116c158-4d17-4c5f-857b-ca0752202352",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "guildId": {
+          "__rl": true,
+          "value": "https://discord.com/channels/1425188997130485871",
+          "mode": "url"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "https://discord.com/channels/1425188997130485871/1425189660899934318",
+          "mode": "url"
+        },
+        "message": "=WEBSITE STATUS : {{ $json.output.website_up }}\n\nMESSAGE:\n{{ $json.output.message }}\n\nNEED APPROVAL: {{ $json.output.needs_approval }}\n\nCOMMAND: {{ $json.output.commands_requested }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -1008
+      ],
+      "id": "4a818cef-4db3-47d6-98d0-15a6c8ef356e",
+      "name": "Send message and wait for response",
+      "webhookId": "52a3b5b3-bbdd-4263-abd3-e33edc8d856b",
+      "credentials": {
+        "discordBotApi": {
+          "id": "cqjIfcQ9G4mylIgk",
+          "name": "Discord Bot account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "154f2ff0-1c61-47fc-9ba7-8f5b96bd1f8e",
+              "name": "prompt",
+              "value": "={{ $json.data.approved }}",
+              "type": "string"
+            },
+            {
+              "id": "69f61bf4-41db-4361-b799-9d1b02cf7107",
+              "name": "chatid",
+              "value": "={{ $('Edit Fields').item.json.chatid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        -1008
+      ],
+      "id": "fbbbe520-4f77-4359-8c63-4a959de5180e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are Friday, a new IT Administrator for Ro706. Your sole responsibility is to ensure the website at http://10.62.17.132:8090 is operational.\nCRITICAL PERMISSION RULES:\n\nYou MUST request EXPLICIT APPROVAL before running ANY command that could modify the system.\nThis includes but is not limited to: docker start, docker stop, docker run, kill, pkill, systemctl, or any command that creates, modifies, or deletes files.\nEven diagnostic commands like docker ps, netstat, or ps are fine without permission.\nWhen in doubt, ASK FIRST.\n\nYou are a Docker expert. You know everything about Docker and common issues that prevent containers from running properly. In our environment, we have a web server that should be running inside a Docker container called \"website\" on port 8090.\nWhen asked if the website is up, follow these systematic troubleshooting steps:\n\nFirst, check if the website is accessible using the HTTP tool.\nThe website is operational ONLY if it returns HTML containing:\n<h1 align=center text=red>Welcome TO Ro706 website </h1>.\nIf the website is down, investigate systematically:\n\nCheck if the container exists and its current state.\nCheck what's currently using port 8090 (could be another process).\nuse this command to troubleshoot \"lsof -i :8090\" by this command you will get the PID and by using kill command you can kill the PID task \"kill <PID>\"\nLook for any error messages or logs.\nRun this for start container \"docker start website\"\nIdentify the root cause before attempting any fix.\n\n\nOnce you've identified the issue, explain what you found and request permission for the specific fix needed.\nOnly after receiving explicit approval, apply the necessary fix to restore the website.\n\nRemember: Always investigate thoroughly before proposing solutions. Something else might be using the port.\nREQUIRED OUTPUT FORMAT:\nYou MUST always respond with a JSON object in this exact format:\n Copy{\n    \"website_up\": true/false,\n    \"message\": \"Detailed explanation of status and any actions taken\",\n    \"applied_fix\": true/false,\n    \"needs_approval\": true/false,\n    \"commands_requested\": \"Specific commands needing approval (null if none)\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -656
+      ],
+      "id": "f7fbedab-ea89-463b-bc5e-4993a5bc16d8",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1425188997130485871",
+          "mode": "list",
+          "cachedResultName": "n8n_website_checker",
+          "cachedResultUrl": "https://discord.com/channels/1425188997130485871"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1425189660899934318",
+          "mode": "list",
+          "cachedResultName": "website_details",
+          "cachedResultUrl": "https://discord.com/channels/1425188997130485871/1425189660899934318"
+        },
+        "content": "=WEBSITE STATUS:  {{ $('AI Agent').item.json.output.website_up }}\n\nMESSAGE: {{ $('AI Agent').item.json.output.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        -224
+      ],
+      "id": "bb4c19f2-749b-4775-ab06-d8171a652c31",
+      "name": "Send a message",
+      "webhookId": "f83b4456-bdb4-4942-ada7-1d5c6ee98ffd",
+      "credentials": {
+        "discordBotApi": {
+          "id": "cqjIfcQ9G4mylIgk",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1425188997130485871",
+          "mode": "list",
+          "cachedResultName": "n8n_website_checker",
+          "cachedResultUrl": "https://discord.com/channels/1425188997130485871"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1425189660899934318",
+          "mode": "list",
+          "cachedResultName": "website_details",
+          "cachedResultUrl": "https://discord.com/channels/1425188997130485871/1425189660899934318"
+        },
+        "content": "=WEBSITE STATUS: {{ $('AI Agent').item.json.output.website_up }}\n\nMESSAGE:  {{ $('AI Agent').item.json.output.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1776,
+        -416
+      ],
+      "id": "aac23a68-3dc3-45bc-873e-414d7258ff8f",
+      "name": "Send a message1",
+      "webhookId": "cacea8b1-25e6-4540-b979-f5625a3d032e",
+      "credentials": {
+        "discordBotApi": {
+          "id": "cqjIfcQ9G4mylIgk",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        784,
+        -224
+      ],
+      "id": "f9f2986f-8b57-4dd8-966c-4b925d58658e",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gdu1GmJvatAyagkm",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CLI TOOL": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "Asia/Kolkata",
+    "availableInMCP": false
+  },
+  "versionId": "5ec01399-ee72-487b-a3f0-9bfb5d463e5a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6222274b4cb72740eaed902916eb76a286d1ef234308e6d1d84d668a1c7f812"
+  },
+  "id": "vYlABaTslodfplKh",
+  "tags": []
+}
