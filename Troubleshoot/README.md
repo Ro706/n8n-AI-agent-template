@@ -67,21 +67,25 @@ flowchart TD
     A[Schedule Trigger] --> B[Set Prompt & ChatID]
     B --> C[AI Agent (Gemini)]
 
-    C --> D[HTTP Tool<br>(Check Website)]
-    C --> E[CLI Tool<br>(Diagnostics: lsof, docker ps, etc.)]
+    %% Diagnostics and HTTP check split
+    C --> D[HTTP Tool<br/>Checks Website]
+    C --> E[CLI Tool<br/>Diagnostics (lsof, docker ps)]
 
     D --> F[Structured Output Parser]
     E --> F
 
-    F -->|website_up = true| G[WEBSITE UP<br>Send Status to Discord]
+    %% Website UP
+    F -->|website_up = true| G[Website UP<br/>Send Status to Discord]
 
-    F -->|website_up = false| H[WEBSITE DOWN<br>AI Requests Approval]
+    %% Website DOWN branch
+    F -->|website_up = false| H[Website DOWN<br/>AI Requests Approval]
 
-    H --> I[Send & Wait Message to Discord<br>(Need Approval)]
-    I --> J[Human Approves / Rejects]
+    H --> I[Send & Wait for Approval on Discord]
+    I --> J[Human Responds]
 
-    J -->|Approved| K[Run SSH Commands<br>(docker start, kill PID)]
-    J -->|Rejected| L[Do Nothing / Notify]
+    J -->|Approved| K[Run SSH Commands<br/>docker start / kill PID]
+    J -->|Rejected| L[Do Nothing<br/>Notify & Stop]
+
 ```
 
 ---
