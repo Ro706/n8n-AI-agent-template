@@ -1,5 +1,4 @@
-# Toubleshoot
-## 🚀 Automated Website Monitoring & Self-Healing System (n8n + AI Agent + Discord + SSH)
+# 🚀 Automated Website Monitoring & Self-Healing System (n8n + AI Agent + Discord + SSH)
 
 This project is an **AI-powered automated troubleshooting system** built using **n8n**, **Google Gemini LLM**, **Discord**, and **SSH**.
 It continuously monitors a website, diagnoses issues, asks for approval before risky fixes, and applies server-side corrections when authorized.
