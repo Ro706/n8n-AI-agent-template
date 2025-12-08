@@ -226,5 +226,9 @@ Then:
 * Email notifications
 * Log-based recovery strategies
 
+<img width="1905" height="907" alt="image" src="https://github.com/user-attachments/assets/2423f9a6-1110-4aad-902a-b4139ba6fb35" />
+<img width="863" height="354" alt="image" src="https://github.com/user-attachments/assets/a746fcc3-ee55-4c7b-a3c3-139a6c8c0613" />
+
+
 
 Just tell me!
